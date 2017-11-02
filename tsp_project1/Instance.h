@@ -7,11 +7,12 @@
 
 struct Node
 {
-    std::vector<std::vector<int> > matrix;
+    std::vector<int> currentPath;
+    std::vector<int> availableCities;
     int city;
-    int lowerBound = 0;
-    Node(std::vector<std::vector<int> > inputMatrix, int inputCity) : matrix(inputMatrix),
-                                                                      city(inputCity)
+    Node(std::vector<int> cities, std::vector<int> path, int thisCity) : availableCities(cities),
+                                                                         currentPath(path),
+                                                                         city(thisCity)
     {}
 };
 
@@ -20,24 +21,13 @@ class Instance
 public:
     Instance();
     Instance(std::list<std::tuple<int, int, int> > cities);
-    int getCost();
 private:
-    int minRow(std::vector<std::vector<int> >& matrix, const int row);
-    int minCol(std::vector<std::vector<int> >& matrix, const int col);
-    int reduceRows(std::vector<std::vector<int> >& matrix);
-    int reduceColumns(std::vector<std::vector<int> >& matrix);
-    int reduceMatrix(std::vector<std::vector<int> >& matrix);
-    void removePaths(std::vector<std::vector<int> >& matrix, const int row, const int col);
-    void createTree(std::vector<std::vector<int> > costMatrix);
-    void branchAndBound(std::vector<std::vector<int> > matrix,
-                        std::vector<Node>& currentLevel,
-                        std::vector<int>& path,
-                        std::vector<int>& visited,
-                        int previousLowerBound,
-                        int level);
+    int calculateLowerBound(std::vector<std::vector<int> >& matrix, std::vector<int>& path, int cost = 0);
+    void prepareTree(std::vector<std::vector<int> >& matrix);
+    void branchAndBound(std::vector<std::vector<int> >& matrix, Node node);
 
     std::vector<int> bestPath;
-    std::vector<std::tuple<int, std::vector<int> > > bestPaths;
     static constexpr int intMax = std::numeric_limits<int>::max();
-    int minCost = 0;
+    int minCost = intMax;
+    int citiesCount = 0;
 };

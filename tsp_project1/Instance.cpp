@@ -1,53 +1,48 @@
 #include "Instance.h"
 
-#include <functional>
-#include <algorithm>
 #include <iostream>
 
 Instance::Instance()
 {
-    std::vector<std::vector<int> > costMatrix = { { intMax, 14, 4, 10, 20 },
+    /*std::vector<std::vector<int> > costMatrix = { { intMax, 14, 4, 10, 20 },
                                                   { 14, intMax, 7,  8,  7 },
                                                   { 4, 5, intMax,  7,  16 },
                                                   { 11, 7,  9, intMax,  2 },
-                                                  { 18, 7, 17,  4, intMax } };
-    /*std::vector<std::vector<int> > costMatrix =
-    { { intMax,    3,    5,   48,   48,    8,    8,    5,    5,    3,    3,    0,   3,    5,    8,    8,  5 },
-    { 3,    intMax,    3,   48,   48,    8,    8,    5,    5,    0,    0,    3,    0,    3,    8,    8, 5 },
-    { 5,    3,  intMax,   72,   72,   48,   48,   24,   24,    3,    3,    5,    3,    0,   48,   48, 24 },
-    { 48,   48,   74, intMax,    0,    6,    6,   12,   12,   48,   48,   48,   48,   74,    6 ,   6 ,12 } ,
-    { 48,   48,   74,    0, intMax,    6,    6,   12,   12,   48,   48,   48,   48,   74,    6,    6, 12 } ,
-    { 8,    8,   50,    6,    6, intMax,    0,    8,    8,    8,    8,    8,    8,   50,    0,    0, 8 } ,
-    { 8,    8,   50,    6,    6,    0, intMax,    8,    8,    8,    8,    8,    8,   50,    0,    0, 8 },
-    { 5,    5,   26,   12,   12,    8,    8, intMax,    0,    5,    5,    5,    5,   26,    8,    8, 0 } ,
-    { 5,    5,   26,   12,   12,    8,    8,    0, intMax,    5,    5,    5,    5,   26,    8,    8, 0 } ,
-    { 3,    0,    3,   48,   48,    8,    8,    5,    5, intMax,    0,    3,    0,    3,    8,    8, 5 } ,
-    { 3,    0,    3,   48,   48,    8,    8,    5,    5,    0, intMax,    3,    0,    3,    8,    8, 5 } ,
-    { 0,    3,    5,   48,   48,    8,    8,    5,    5,    3,    3, intMax,    3,    5,    8,    8, 5 } ,
-    { 3,    0,    3,   48,   48,    8,    8,    5,    5,    0,    0,    3, intMax,    3,    8,    8, 5 } ,
-    { 5,    3,    0,   72,   72,   48,   48,   24,   24,    3,    3,    5,    3, intMax,   48,   48, 24 } ,
-    { 8,    8,   50,    6,    6,    0,    0,    8,    8,    8,    8,    8,    8,   50, intMax,    0, 8 } ,
-    { 8,    8,   50,    6,    6,    0,    0,    8,    8,    8,    8,    8,    8,   50,    0, intMax, 8 } ,
-    { 5,    5,   26,   12,   12,    8,    8,    0,    0,    5,    5,    5,    5,   26,    8,    8, intMax } };*/
+                                                  { 18, 7, 17,  4, intMax } };*/
 
-    bestPaths.reserve(costMatrix.size());
-    createTree(costMatrix);
+    std::vector<std::vector<int> > costMatrix = { {intMax, 3, 4, 2, 7 },
+                                                  { 3, intMax, 4, 6, 3},
+                                                  { 4, 4, intMax, 5, 8},
+                                                  { 2, 6, 5, intMax, 6},
+                                                  { 7, 3, 8, 6, intMax} };
 
-    auto bestPath = std::min_element(bestPaths.begin(), bestPaths.end(),
-        [](const std::tuple<int, std::vector<int> >& e1, std::tuple<int, std::vector<int> >& e2)
-    {
-        return std::get<0>(e1) < std::get<0>(e2);
-    });
-    std::cout << std::get<0>(*bestPath) << std::endl;
+    /*std::vector<std::vector<int> > costMatrix = { { intMax, 10, 8, 9, 7 },
+                                                  { 10, intMax, 10, 5, 6 },
+                                                  { 8, 10, intMax, 8, 9 },
+                                                  { 9, 5, 8, intMax, 6 },
+                                                  { 7, 6, 9, 6, intMax } };*/
+
+    /*std::vector<std::vector<int> > costMatrix = { { intMax, 3, 1, 5, 8 },
+                                                  { 3, intMax, 6, 7, 8 },
+                                                  { 1, 6, intMax, 4, 2 },
+                                                  { 5, 7, 4, intMax, 3 },
+                                                  { 8, 9, 2, 3, intMax } };*/
+
+    citiesCount = costMatrix.size();
+    prepareTree(costMatrix);
+
+    std::cout << minCost << std::endl;
     std::cout << std::endl;
-    for (const auto& c : std::get<1>(*bestPath))
+
+    for (const auto& e : bestPath)
     {
-        std::cout << c << " ";
+        std::cout << e << " ";
     }
+    std::cout << std::endl;
     std::cout << std::endl;
 }
 
-Instance::Instance(std::list<std::tuple<int, int, int> > cities)
+Instance::Instance(std::list<std::tuple<int, int, int>> cities)
 {
     std::vector<std::vector<int> > costMatrix(cities.size(), std::vector<int>(cities.size()));
     int x, y;
@@ -66,190 +61,88 @@ Instance::Instance(std::list<std::tuple<int, int, int> > cities)
     {
         costMatrix[i][i] = intMax;
     }
+    citiesCount = costMatrix.size();
+    prepareTree(costMatrix);
 
-    bestPaths.reserve(costMatrix.size());
-    createTree(costMatrix);
-
-    auto bestPath = std::min_element(bestPaths.begin(), bestPaths.end(),
-        [](const std::tuple<int, std::vector<int> >& e1, std::tuple<int, std::vector<int> >& e2)
-    {
-        return std::get<0>(e1) < std::get<0>(e2);
-    });
-    std::cout << std::get<0>(*bestPath) << std::endl;
+    std::cout << minCost << std::endl;
     std::cout << std::endl;
-    for (const auto& c : std::get<1>(*bestPath))
+
+    for (const auto& e : bestPath)
     {
-        std::cout << c << " ";
+        std::cout << e << " ";
     }
+    std::cout << std::endl;
     std::cout << std::endl;
 }
 
-int Instance::getCost()
+int Instance::calculateLowerBound(std::vector<std::vector<int> >& matrix, std::vector<int>& path, int cost)
 {
-    return minCost;
+    int lowerBound = 0;
+    for (int i = 0; i < path.size() - 1; ++i)
+    {
+        lowerBound += matrix[path[i]][path[i + 1]];
+    }
+    lowerBound += cost;
+    if (path.size() == citiesCount)
+    {
+        lowerBound += matrix[path.back()][0];
+    }
+    return lowerBound;
 }
 
-int Instance::minRow(std::vector<std::vector<int> >& matrix, const int row)
+void Instance::prepareTree(std::vector<std::vector<int> >& matrix)
 {
-    int min = intMax;
-    for (int i = 0; i < matrix.size(); ++i)
-    {
-        min = std::min(min, matrix[row][i]);
-    }
-    if (min == intMax)
-    {
-        return 0;
-    }
-    return min;
-}
-
-int Instance::minCol(std::vector<std::vector<int> >& matrix, const int col)
-{
-    int min = intMax;
-    for (int i = 0; i < matrix.size(); ++i)
-    {
-        min = std::min(min, matrix[i][col]);
-    }
-    if (min == intMax)
-    {
-        return 0;
-    }
-    return min;
-}
-
-int Instance::reduceRows(std::vector<std::vector<int> >& matrix)
-{
-    int rowBound = 0;
-    for (int i = 0; i < matrix.size(); ++i)
-    {
-        int rmin = minRow(matrix, i);
-        if (rmin > 0)
-        {
-            for (int k = 0; k < matrix.size(); ++k)
-            {
-                if (matrix[i][k] != intMax)
-                {
-                    matrix[i][k] -= rmin;
-                }
-            }
-            rowBound += rmin;
-        }
-    }
-    return rowBound;
-}
-
-int Instance::reduceColumns(std::vector<std::vector<int> >& matrix)
-{
-    int colBound = 0;
-    for (int i = 0; i < matrix.size(); ++i)
-    {
-        int cmin = minCol(matrix, i);
-        if (cmin > 0)
-        {
-            for (int k = 0; k < matrix.size(); ++k)
-            {
-                if (matrix[k][i] != intMax)
-                {
-                    matrix[k][i] -= cmin;
-                }
-            }
-            colBound += cmin;
-        }
-    }
-    return colBound;
-}
-
-int Instance::reduceMatrix(std::vector<std::vector<int> >& matrix)
-{
-    int rowBound = reduceRows(matrix);
-    int colBound = reduceColumns(matrix);
-    return rowBound + colBound;
-}
-
-void Instance::removePaths(std::vector<std::vector<int> >& matrix, const int row, const int col)
-{
-    for (int i = 0; i < matrix.size(); ++i)
-    {
-        matrix[row][i] = intMax;
-        matrix[i][col] = intMax;
-    }
-    matrix[col][row] = intMax;
-}
-
-//void Instance::createTree(std::vector<std::vector<int> > costMatrix)
-//{
-//    std::vector<std::vector<int> > matrix = costMatrix;
-//    std::vector<Node> currentLevel;
-//    std::vector<int> visited(matrix.size(), 0);
-//    std::vector<int> path;
-//    path.push_back(0);
-//    visited[0] = 1;
-//    int currentLowerBound = reduceMatrix(matrix);
-//    branchAndBound(matrix, currentLevel, path, visited, currentLowerBound, 0);
-//    bestPath = std::move(path);
-//}
-
-void Instance::createTree(std::vector<std::vector<int> > costMatrix)
-{
-    std::vector<std::vector<int> > matrix = costMatrix;
-    std::vector<Node> currentLevel;
-    std::vector<int> visited(matrix.size(), 0);
     std::vector<int> path;
-    int cost = 0;
-    for (int i = 0; i < matrix.size(); ++i)
+    std::vector<int> availableCities;
+    path.push_back(0);
+    for (int i = 1; i < matrix.size(); ++i)
     {
-        cost = 0;
-        std::replace(visited.begin(), visited.end(), 1, 0);
-        path.clear();
-        path.push_back(i);
-        visited[i] = 1;
-        int currentLowerBound = reduceMatrix(matrix);
-        branchAndBound(matrix, currentLevel, path, visited, currentLowerBound, 0);
-        for (int k = 0; k < costMatrix.size() - 1; ++k)
-        {
-            cost += costMatrix[path[k]][path[k + 1]];
-        }
-        cost += costMatrix[path.back()][i];
-        bestPaths.push_back(std::make_tuple(cost, path));
+        availableCities.push_back(i);
     }
+    Node root{ availableCities, path, 0 };
+    branchAndBound(matrix, root);
 }
 
-void Instance::branchAndBound(std::vector<std::vector<int> > matrix,
-                              std::vector<Node>& currentLevel,
-                              std::vector<int>& path,
-                              std::vector<int>& visited,
-                              int previousLowerBound,
-                              int level)
+void Instance::branchAndBound(std::vector<std::vector<int> >& matrix, Node node)
 {
-    currentLevel.clear();
-    if (path.size() == matrix.size())
+    if ((node.currentPath.size() > 1) && (calculateLowerBound(matrix, node.currentPath) > minCost))
     {
         return;
     }
-    int parent = path.back();
-    for (int i = 0; i < matrix.size(); ++i)
+    if (node.currentPath.size() == matrix.size())
     {
-        if (visited[i])
+        int lowerBound = calculateLowerBound(matrix, node.currentPath);
+        if (lowerBound < minCost)
         {
-            continue;
+            minCost = lowerBound;
+            bestPath = node.currentPath;
         }
-        Node node{ matrix, i };
-        if (matrix[parent][i] == intMax)
-        {
-            node.lowerBound = intMax;
-        }
-        else
-        {
-            node.lowerBound = previousLowerBound + matrix[parent][i] + reduceMatrix(node.matrix);
-        }
-        removePaths(node.matrix, parent, i);
-        currentLevel.push_back(node);
+        return;
     }
-    auto lowestCostNodeItr = std::min_element(currentLevel.begin(), currentLevel.end(), [](const Node& e1, const Node& e2)
+    std::vector<Node> nodes;
+    for (int i = 1; i < matrix.size(); ++i)
     {
-        return e1.lowerBound < e2.lowerBound;
-    });
-    path.push_back(lowestCostNodeItr->city);
-    visited[lowestCostNodeItr->city] = 1;
-    branchAndBound(lowestCostNodeItr->matrix, currentLevel, path, visited, lowestCostNodeItr->lowerBound, ++level);
+        if (std::find(node.currentPath.begin(), node.currentPath.end(), i) == node.currentPath.end())
+        {
+            std::vector<int> availableCities;
+            for (int k = 1; k < matrix.size(); ++k)
+            {
+                if (i != k && (std::find(node.currentPath.begin(), node.currentPath.end(), k) == node.currentPath.end()))
+                {
+                    availableCities.push_back(k);
+                }
+            }
+            Node newNode{ availableCities, node.currentPath, i };
+            newNode.currentPath.push_back(i);
+            nodes.push_back(newNode);
+        }
+    }
+    for (auto& next : nodes)
+    {
+        if (!next.availableCities.empty())
+        {
+            next.availableCities.erase(next.availableCities.begin());
+        }
+        branchAndBound(matrix, next);
+    }
 }
