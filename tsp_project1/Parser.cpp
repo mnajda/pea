@@ -21,6 +21,10 @@ std::list<std::tuple<int, int, int> > Parser::getCities() const
 bool Parser::loadDataFromFile(const std::string& filename)
 {
     std::ifstream file(filename);
+    if (!file.is_open())
+    {
+        return false;
+    }
     std::string line;
     int cityNumber, firstCoordinate, secondCoordinate;
     while (file.good())
@@ -40,5 +44,4 @@ bool Parser::loadDataFromFile(const std::string& filename)
         }
         cities.push_back(std::make_tuple(cityNumber, firstCoordinate, secondCoordinate));
     }
-    return false;
 }

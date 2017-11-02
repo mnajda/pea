@@ -8,7 +8,7 @@
 struct Node
 {
     std::vector<std::vector<int> > matrix;
-    int city = 0;
+    int city;
     int lowerBound = 0;
     Node(std::vector<std::vector<int> > inputMatrix, int inputCity) : matrix(inputMatrix),
                                                                       city(inputCity)
