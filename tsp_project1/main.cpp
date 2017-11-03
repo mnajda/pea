@@ -12,6 +12,7 @@ int main(int argc, char** argv)
         //Instance instance(parser.getCities());
         Instance instance;
         instance.printSolution();
+        instance.printTime();
     }
     catch (const std::invalid_argument& ex)
     {
