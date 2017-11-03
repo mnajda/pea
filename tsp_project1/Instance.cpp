@@ -28,18 +28,30 @@ Instance::Instance()
                                                   { 5, 7, 4, intMax, 3 },
                                                   { 8, 9, 2, 3, intMax } };*/
 
-    citiesCount = costMatrix.size();
-    prepareTree(costMatrix);
+    /*std::vector<std::vector<int> > costMatrix = {   { 9999, 3, 5, 48, 48, 8, 8, 5, 5, 3, 3, 0, 3, 5, 8, 8, 5, },
+                                                    { 3, 9999, 3, 48, 48, 8, 8, 5, 5, 0, 0, 3, 0, 3, 8, 8, 5, },
+                                                    { 5, 3, 9999, 72, 72, 48, 48, 24, 24, 3, 3, 5, 3, 0, 48, 48, 24, },
+                                                    {48, 48, 74, 9999, 0, 6, 6, 12, 12, 48, 48, 48, 48, 74, 6, 6, 12, },
+                                                    { 48, 48, 74, 0, 9999, 6, 6, 12, 12, 48, 48, 48, 48, 74, 6, 6, 12, },
+                                                    {8, 8, 50, 6, 6, 9999, 0, 8, 8, 8, 8, 8, 8, 50, 0, 0, 8, },
+                                                    {8, 8, 50, 6, 6, 0, 9999, 8, 8, 8, 8, 8, 8, 50, 0, 0, 8, },
+                                                    { 5, 5, 26, 12, 12, 8, 8, 9999, 0, 5, 5, 5, 5, 26, 8, 8, 0, },
+                                                    {5, 5, 26, 12, 12, 8, 8, 0, 9999, 5, 5, 5, 5, 26, 8, 8, 0, },
+                                                    {3, 0, 3, 48, 48, 8, 8, 5, 5, 9999, 0, 3, 0, 3, 8, 8, 5, },
+                                                    {3, 0, 3, 48, 48, 8, 8, 5, 5, 0, 9999, 3, 0, 3, 8, 8, 5, },
+                                                    { 0, 3, 5, 48, 48, 8, 8, 5, 5, 3, 3, 9999, 3, 5, 8, 8, 5, },
+                                                    { 3, 0, 3, 48, 48, 8, 8, 5, 5, 0, 0, 3, 9999, 3, 8, 8, 5, },
+                                                    {5, 3, 0, 72, 72, 48, 48, 24, 24, 3, 3, 5, 3, 9999, 48, 48, 24, },
+                                                    { 8, 8, 50, 6, 6, 0, 0, 8, 8, 8, 8, 8, 8, 50, 9999, 0, 8, },
+                                                    {8, 8, 50, 6, 6, 0, 0, 8, 8, 8, 8, 8, 8, 50, 0, 9999, 8, },
+                                                    {5, 5, 26, 12, 12, 8, 8, 0, 0, 5, 5, 5, 5, 26, 8, 8, 9999, }   };*/
 
-    std::cout << minCost << std::endl;
-    std::cout << std::endl;
-
-    for (const auto& e : bestPath)
+    /*for (int i = 0; i < costMatrix.size(); ++i)
     {
-        std::cout << e << " ";
-    }
-    std::cout << std::endl;
-    std::cout << std::endl;
+        costMatrix[i][i] = intMax;
+    }*/
+
+    prepareTree(costMatrix);
 }
 
 Instance::Instance(std::list<std::tuple<int, int, int>> cities)
@@ -61,11 +73,15 @@ Instance::Instance(std::list<std::tuple<int, int, int>> cities)
     {
         costMatrix[i][i] = intMax;
     }
-    citiesCount = costMatrix.size();
     prepareTree(costMatrix);
+}
 
+void Instance::printSolution()
+{
     std::cout << minCost << std::endl;
     std::cout << std::endl;
+
+    bestPath.push_back(0);
 
     for (const auto& e : bestPath)
     {
@@ -75,15 +91,14 @@ Instance::Instance(std::list<std::tuple<int, int, int>> cities)
     std::cout << std::endl;
 }
 
-int Instance::calculateLowerBound(std::vector<std::vector<int> >& matrix, std::vector<int>& path, int cost)
+int Instance::calculateLowerBound(std::vector<std::vector<int> >& matrix, std::vector<int>& path)
 {
     int lowerBound = 0;
     for (int i = 0; i < path.size() - 1; ++i)
     {
         lowerBound += matrix[path[i]][path[i + 1]];
     }
-    lowerBound += cost;
-    if (path.size() == citiesCount)
+    if (path.size() == matrix.size())
     {
         lowerBound += matrix[path.back()][0];
     }
@@ -93,13 +108,8 @@ int Instance::calculateLowerBound(std::vector<std::vector<int> >& matrix, std::v
 void Instance::prepareTree(std::vector<std::vector<int> >& matrix)
 {
     std::vector<int> path;
-    std::vector<int> availableCities;
     path.push_back(0);
-    for (int i = 1; i < matrix.size(); ++i)
-    {
-        availableCities.push_back(i);
-    }
-    Node root{ availableCities, path, 0 };
+    Node root{ path, 0 };
     branchAndBound(matrix, root);
 }
 
@@ -124,25 +134,13 @@ void Instance::branchAndBound(std::vector<std::vector<int> >& matrix, Node node)
     {
         if (std::find(node.currentPath.begin(), node.currentPath.end(), i) == node.currentPath.end())
         {
-            std::vector<int> availableCities;
-            for (int k = 1; k < matrix.size(); ++k)
-            {
-                if (i != k && (std::find(node.currentPath.begin(), node.currentPath.end(), k) == node.currentPath.end()))
-                {
-                    availableCities.push_back(k);
-                }
-            }
-            Node newNode{ availableCities, node.currentPath, i };
+            Node newNode{ node.currentPath, i };
             newNode.currentPath.push_back(i);
             nodes.push_back(newNode);
         }
     }
     for (auto& next : nodes)
     {
-        if (!next.availableCities.empty())
-        {
-            next.availableCities.erase(next.availableCities.begin());
-        }
         branchAndBound(matrix, next);
     }
 }

@@ -11,6 +11,7 @@ int main(int argc, char** argv)
 
         //Instance instance(parser.getCities());
         Instance instance;
+        instance.printSolution();
     }
     catch (const std::invalid_argument& ex)
     {
