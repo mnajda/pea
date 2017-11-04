@@ -2,14 +2,18 @@
 
 #include <string>
 #include <list>
+#include <vector>
 #include <tuple>
 
 class Parser
 {
 public:
-    explicit Parser(const std::string& filename);
-    std::list<std::tuple<int, int, int> > getCities() const;
+    Parser();
+    std::list<std::tuple<int, int, int> > getCitiesList() const;
+    std::vector<std::vector<int> > getcitiesMatrix() const;
+    bool loadCitiesList(const std::string& filename);
+    bool loadCitiesMatrix(const std::string& filename);
 private:
-    std::list<std::tuple<int, int, int> > cities;
-    bool loadDataFromFile(const std::string& filename);
+    std::list<std::tuple<int, int, int> > citiesList;
+    std::vector<std::vector<int> > citiesMatrix;
 };

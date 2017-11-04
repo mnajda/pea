@@ -20,12 +20,15 @@ class Instance
 public:
     Instance();
     Instance(std::list<std::tuple<int, int, int> > cities);
+    Instance(std::vector<std::vector<int> > cities);
     void printSolution();
     void printTime();
 private:
     int calculateLowerBound(std::vector<std::vector<int> >& matrix, std::vector<int>& path) const;
     void prepareTree(std::vector<std::vector<int> >& matrix);
     void branchAndBound(std::vector<std::vector<int> >& matrix, Node node);
+    int calculateBruteForce(std::vector<std::vector<int> >& matrix, std::vector<int>& path) const;
+    void bruteForce(std::vector<std::vector<int> >& matrix);
 
     std::vector<int> bestPath;
     static constexpr int intMax = std::numeric_limits<int>::max();
