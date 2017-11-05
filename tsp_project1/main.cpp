@@ -58,12 +58,19 @@ int main(int argc, char** argv)
         }
         case '3':
         {
-            std::cout << "Filename: \n";
-            std::cin >> filename;
+            try
+            {
+                std::cout << "Filename: \n";
+                std::cin >> filename;
 
-            Parser parser;
-            parser.loadCitiesMatrix(filename);
-            Instance instance(parser.getcitiesMatrix(), 1);
+                Parser parser;
+                parser.loadCitiesMatrix(filename);
+                Instance instance(parser.getcitiesMatrix(), 1);
+            }
+            catch (const std::runtime_error& ex)
+            {
+                std::cout << ex.what() << std::endl;
+            }
             break;
         }
         case '4':
