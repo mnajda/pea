@@ -20,7 +20,7 @@ class Instance
 public:
     Instance(std::vector<std::vector<int> > costMatrix, int enableBF);
     Instance(std::list<std::tuple<int, int, int> > cities);
-    Instance(std::vector<std::vector<int> > cities);
+    Instance(std::vector<std::vector<int> > costMatrix);
     void printSolution();
     void printTime();
 private:
