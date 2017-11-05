@@ -3,15 +3,14 @@
 #include <iostream>
 #include <algorithm>
 
-Instance::Instance()
+Instance::Instance(std::vector<std::vector<int> > costMatrix, int enableBF)
 {
     using clock = std::chrono::high_resolution_clock;
 
-    std::vector<std::vector<int> > costMatrix = { { intMax, 14, 4, 10, 20 },
-                                                  { 14, intMax, 7,  8,  7 },
-                                                  { 4, 5, intMax,  7,  16 },
-                                                  { 11, 7,  9, intMax,  2 },
-                                                  { 18, 7, 17,  4, intMax } };
+    for (int i = 0; i < costMatrix.size(); ++i)
+    {
+        costMatrix[i][i] = intMax;
+    }
 
     auto begin = clock::now();
     prepareTree(costMatrix);
@@ -90,13 +89,10 @@ void Instance::printSolution()
 }
 
 void Instance::printTime()
-{   
-    std::cout << std::chrono::duration_cast<std::chrono::nanoseconds>(time).count() << " ns" << std::endl;
-    std::cout << std::endl;
-    std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(time).count() << " ms" << std::endl;
-    std::cout << std::endl;
-    std::cout << std::chrono::duration_cast<std::chrono::seconds>(time).count() << " s" << std::endl;
-    std::cout << "---------------------------------" << std::endl;
+{
+    std::cout << std::chrono::duration_cast<std::chrono::nanoseconds>(time).count() << "ns ";
+    std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(time).count() << "ms ";
+    std::cout << std::chrono::duration_cast<std::chrono::seconds>(time).count() << "s" << std::endl;
 }
 
 int Instance::calculateLowerBound(std::vector<std::vector<int> >& matrix, std::vector<int>& path) const
