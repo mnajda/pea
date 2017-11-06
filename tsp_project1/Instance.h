@@ -10,8 +10,8 @@ struct Node
 {
     std::vector<int> currentPath;
     int city;
-    Node(std::vector<int> path, int thisCity) : currentPath(path),
-                                                city(thisCity)
+    Node(std::vector<int>& path, int thisCity) : currentPath(path),
+                                                 city(thisCity)
     {}
 };
 
@@ -26,7 +26,7 @@ public:
 private:
     int calculateLowerBound(std::vector<std::vector<int> >& matrix, std::vector<int>& path) const;
     void prepareTree(std::vector<std::vector<int> >& matrix);
-    void branchAndBound(std::vector<std::vector<int> >& matrix, Node node);
+    void branchAndBound(std::vector<std::vector<int> >& matrix, Node& node);
     int calculateBruteForce(std::vector<std::vector<int> >& matrix, std::vector<int>& path) const;
     void bruteForce(std::vector<std::vector<int> >& matrix);
 

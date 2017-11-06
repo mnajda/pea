@@ -102,13 +102,8 @@ int Instance::calculateLowerBound(std::vector<std::vector<int> >& matrix, std::v
     {
         lowerBound += matrix[path[i]][path[i + 1]];
     }
-    if (path.size() == matrix.size())
-    {
-        lowerBound += matrix[path.back()][0];
-    }
     return lowerBound;
 }
-
 
 void Instance::prepareTree(std::vector<std::vector<int> >& matrix)
 {
@@ -119,15 +114,12 @@ void Instance::prepareTree(std::vector<std::vector<int> >& matrix)
     branchAndBound(matrix, root);
 }
 
-void Instance::branchAndBound(std::vector<std::vector<int> >& matrix, Node node)
+void Instance::branchAndBound(std::vector<std::vector<int> >& matrix, Node& node)
 {
-    if ((node.currentPath.size() > 1) && (calculateLowerBound(matrix, node.currentPath) > minCost))
-    {
-        return;
-    }
+    int lowerBound = calculateLowerBound(matrix, node.currentPath);
     if (node.currentPath.size() == matrix.size())
     {
-        int lowerBound = calculateLowerBound(matrix, node.currentPath);
+        lowerBound += matrix[node.currentPath.back()][0];
         if (lowerBound < minCost)
         {
             minCost = lowerBound;
@@ -137,17 +129,18 @@ void Instance::branchAndBound(std::vector<std::vector<int> >& matrix, Node node)
     }
     std::vector<Node> nodes;
     nodes.reserve(matrix.size() - 1);
-
     for (int i = 1; i < matrix.size(); ++i)
     {
         if (std::find(node.currentPath.begin(), node.currentPath.end(), i) == node.currentPath.end())
         {
-            Node newNode{ node.currentPath, i };
-            newNode.currentPath.push_back(i);
-            nodes.push_back(newNode);
+            if (lowerBound + matrix[node.currentPath.back()][i] < minCost)
+            {
+                nodes.emplace_back(node.currentPath, i);
+                nodes.back().currentPath.push_back(i);
+            }
         }
     }
-    for (const auto& next : nodes)
+    for (auto& next : nodes)
     {
         branchAndBound(matrix, next);
     }
