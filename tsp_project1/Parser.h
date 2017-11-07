@@ -13,6 +13,7 @@ public:
     std::vector<std::vector<int> > getcitiesMatrix() const;
     bool loadCitiesList(const std::string& filename);
     bool loadCitiesMatrix(const std::string& filename);
+    bool loadLowerDiagonalRow(const std::string& filename);
 private:
     std::list<std::tuple<int, int, int> > citiesList;
     std::vector<std::vector<int> > citiesMatrix;

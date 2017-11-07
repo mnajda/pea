@@ -67,3 +67,32 @@ bool Parser::loadCitiesMatrix(const std::string& filename)
     }
     return true;
 }
+
+bool Parser::loadLowerDiagonalRow(const std::string & filename)
+{
+    int dimension = 0;
+    std::ifstream file(filename);
+    if (!file.is_open())
+    {
+        throw std::runtime_error("Can't open file");
+    }
+    std::string line;
+    file >> dimension;
+    citiesMatrix.resize(dimension);
+    for (int i = 0; i < dimension; ++i)
+    {
+        for (int j = 0; j < (i + 1); ++j)
+        {
+            file >> line;
+            citiesMatrix[i].push_back(std::stoi(line));
+        }
+    }
+    for (int i = 0; i < dimension; ++i)
+    {
+        for (int j = i + 1; j < dimension; ++j)
+        {
+            citiesMatrix[i].push_back(citiesMatrix[j][i]);
+        }
+    }
+    return true;
+}
