@@ -66,7 +66,7 @@ int main(int argc, char** argv)
 
                 Parser parser;
                 parser.loadLowerDiagonalRow(filename);
-                Instance instance(parser.getCitiesList());
+                Instance instance(parser.getCitiesMatrix());
                 instance.printSolution();
                 instance.printTime();
             }
