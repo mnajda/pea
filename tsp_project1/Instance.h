@@ -25,13 +25,14 @@ public:
     void printSolution();
     void printTime();
 private:
-    std::list<std::tuple<int, int> > getValues(std::vector<std::vector<int> >& matrix, std::vector<int>& path) const;
-    int getLowerBound(std::vector<std::vector<int> >& matrix, std::vector<int>& path, const int cost) const;
-    void prepareTree(std::vector<std::vector<int> >& matrix);
-    void branchAndBound(std::vector<std::vector<int> >& matrix, Node& node);
-    int calculateBruteForce(std::vector<std::vector<int> >& matrix, std::vector<int>& path) const;
-    void bruteForce(std::vector<std::vector<int> >& matrix);
+    std::list<std::tuple<int, int> > getValues(std::vector<int>& path) const;
+    int getLowerBound(std::vector<int>& path, const int cost) const;
+    void prepareTree();
+    void branchAndBound(Node& node);
+    int calculateBruteForce(std::vector<int>& path) const;
+    void bruteForce();
 
+    std::vector<std::vector<int> > matrix;
     std::vector<int> bestPath;
     static constexpr int intMax = std::numeric_limits<int>::max();
     int minCost = intMax;
