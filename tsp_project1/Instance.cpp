@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <algorithm>
+#include <functional>
 
 Instance::Instance(std::vector<std::vector<int> > costMatrix, int enableBF)
 {
@@ -95,6 +96,44 @@ void Instance::printTime()
     std::cout << std::chrono::duration_cast<std::chrono::seconds>(time).count() << "s" << std::endl;
 }
 
+std::list<std::tuple<int, int> > Instance::getValues(std::vector<std::vector<int> >& matrix, std::vector<int>& path) const
+{
+    std::list<std::tuple<int, int> > values;
+    for (int i = 0; i < matrix.size(); ++i)
+    {
+        if (std::find(path.begin(), path.end(), i) == path.end())
+        {
+            for (int j = 0; j < matrix.size(); ++j)
+            {
+                if ((std::find(path.begin(), path.end(), j) == path.end()) && matrix[i][j] != intMax)
+                {
+                    values.push_back(std::make_tuple(matrix[i][j], j));
+                }
+            }
+        }
+    }
+    return values;
+}
+
+int Instance::getLowerBound(std::vector<std::vector<int> >& matrix, std::vector<int>& path, const int cost) const
+{
+    int count = 0;
+    int lowerBound = cost;
+    std::list<std::tuple<int, int> > minCosts;
+    minCosts = getValues(matrix, path);
+    minCosts.sort();
+    while (!minCosts.empty())
+    {
+        lowerBound += std::get<0>(minCosts.front());
+        int city = std::get<1>(minCosts.front());
+        minCosts.remove_if([&city](const auto& e1)
+        {
+            return std::get<1>(e1) == city;
+        });
+    }
+    return lowerBound;
+}
+
 void Instance::prepareTree(std::vector<std::vector<int> >& matrix)
 {
     std::vector<int> path;
@@ -123,7 +162,8 @@ void Instance::branchAndBound(std::vector<std::vector<int> >& matrix, Node& node
         if (std::find(node.currentPath.begin(), node.currentPath.end(), i) == node.currentPath.end())
         {
             int cost = node.cost + matrix[node.currentPath.back()][i];
-            if (cost < minCost)
+            //if (cost < minCost)
+            if (getLowerBound(matrix, node.currentPath, node.cost) < minCost)
             {
                 nodes.emplace_back(node.currentPath, i);
                 nodes.back().currentPath.push_back(i);
