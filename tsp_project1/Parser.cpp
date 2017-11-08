@@ -13,7 +13,7 @@ std::list<std::tuple<int, int, int> > Parser::getCitiesList() const
     return citiesList;
 }
 
-std::vector<std::vector<int> > Parser::getcitiesMatrix() const
+std::vector<std::vector<int> > Parser::getCitiesMatrix() const
 {
     return citiesMatrix;
 }
