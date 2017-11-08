@@ -28,7 +28,7 @@ int main(int argc, char** argv)
 
                 Parser parser;
                 parser.loadCitiesMatrix(filename);
-                Instance instance(parser.getcitiesMatrix());
+                Instance instance(parser.getCitiesMatrix());
                 instance.printSolution();
                 instance.printTime();
             }
@@ -85,7 +85,7 @@ int main(int argc, char** argv)
 
                 Parser parser;
                 parser.loadCitiesMatrix(filename);
-                Instance instance(parser.getcitiesMatrix(), 1);
+                Instance instance(parser.getCitiesMatrix(), 1);
             }
             catch (const std::runtime_error& ex)
             {
@@ -104,7 +104,7 @@ int main(int argc, char** argv)
                     {
                         Parser parser;
                         parser.loadCitiesMatrix(filename);
-                        Instance instance(parser.getcitiesMatrix());
+                        Instance instance(parser.getCitiesMatrix());
                         instance.printTime();
                     }
                 }

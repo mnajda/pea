@@ -95,16 +95,6 @@ void Instance::printTime()
     std::cout << std::chrono::duration_cast<std::chrono::seconds>(time).count() << "s" << std::endl;
 }
 
-int Instance::calculateLowerBound(std::vector<std::vector<int> >& matrix, std::vector<int>& path) const
-{
-    int lowerBound = 0;
-    for (int i = 0; i < path.size() - 1; ++i)
-    {
-        lowerBound += matrix[path[i]][path[i + 1]];
-    }
-    return lowerBound;
-}
-
 void Instance::prepareTree(std::vector<std::vector<int> >& matrix)
 {
     std::vector<int> path;
@@ -116,13 +106,12 @@ void Instance::prepareTree(std::vector<std::vector<int> >& matrix)
 
 void Instance::branchAndBound(std::vector<std::vector<int> >& matrix, Node& node)
 {
-    int lowerBound = calculateLowerBound(matrix, node.currentPath);
     if (node.currentPath.size() == matrix.size())
     {
-        lowerBound += matrix[node.currentPath.back()][0];
-        if (lowerBound < minCost)
+        node.cost += matrix[node.currentPath.back()][0];
+        if (node.cost < minCost)
         {
-            minCost = lowerBound;
+            minCost = node.cost;
             bestPath = node.currentPath;
         }
         return;
@@ -133,10 +122,12 @@ void Instance::branchAndBound(std::vector<std::vector<int> >& matrix, Node& node
     {
         if (std::find(node.currentPath.begin(), node.currentPath.end(), i) == node.currentPath.end())
         {
-            if (lowerBound + matrix[node.currentPath.back()][i] < minCost)
+            int cost = node.cost + matrix[node.currentPath.back()][i];
+            if (cost < minCost)
             {
                 nodes.emplace_back(node.currentPath, i);
                 nodes.back().currentPath.push_back(i);
+                nodes.back().cost = cost;
             }
         }
     }

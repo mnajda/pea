@@ -10,6 +10,7 @@ struct Node
 {
     std::vector<int> currentPath;
     int city;
+    int cost = 0;
     Node(std::vector<int>& path, int thisCity) : currentPath(path),
                                                  city(thisCity)
     {}
@@ -24,7 +25,6 @@ public:
     void printSolution();
     void printTime();
 private:
-    int calculateLowerBound(std::vector<std::vector<int> >& matrix, std::vector<int>& path) const;
     void prepareTree(std::vector<std::vector<int> >& matrix);
     void branchAndBound(std::vector<std::vector<int> >& matrix, Node& node);
     int calculateBruteForce(std::vector<std::vector<int> >& matrix, std::vector<int>& path) const;
