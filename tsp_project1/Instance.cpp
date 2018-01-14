@@ -103,9 +103,9 @@ void Instance::printTime()
     std::cout << std::chrono::duration_cast<std::chrono::seconds>(time).count() << "s" << std::endl;
 }
 
-std::list<std::tuple<int, int> > Instance::getValues(std::vector<int>& path) const
+std::list<int> Instance::getValues(std::vector<int>& path) const
 {
-    std::list<std::tuple<int, int> > values;
+    std::list<int> values;
     std::vector<bool> visited(matrix.size(), false);
     for (int i = 0; i < matrix.size(); ++i)
     {
@@ -116,38 +116,37 @@ std::list<std::tuple<int, int> > Instance::getValues(std::vector<int>& path) con
     }
     for (int i = 0; i < matrix.size(); ++i)
     {
+        int min = intMax;
         if (!visited[i])
         {
             for (int j = 0; j < matrix.size(); ++j)
             {
                 if (!visited[j])
                 {
-                    values.push_back(std::make_tuple(matrix[i][j], j));
+                    min = std::min(min, matrix[i][j]);
                 }
             }
+            values.push_back(min);
         }
     }
+    values.sort();
     return values;
 }
 
 int Instance::getLowerBound(std::vector<int>& path, const int cost) const
 {
     int lowerBound = cost;
-    std::list<std::tuple<int, int> > minCosts;
+    std::list<int> minCosts;
     minCosts = getValues(path);
-    minCosts.sort();
+    int city = 0;
     while (!minCosts.empty())
     {
-        lowerBound += std::get<0>(minCosts.front());
+        lowerBound += minCosts.front();
         if (lowerBound > minCost)
         {
             return lowerBound;
         }
-        int city = std::get<1>(minCosts.front());
-        minCosts.remove_if([&city](const auto& e1)
-        {
-            return std::get<1>(e1) == city;
-        });
+        minCosts.pop_front();
     }
     return lowerBound;
 }

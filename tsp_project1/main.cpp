@@ -47,7 +47,7 @@ int main(int argc, char** argv)
 
                 Parser parser;
                 parser.loadCitiesList(filename);
-                Instance instance(parser.getCitiesList());
+                Instance instance(parser.getCitiesMatrix());
                 instance.printSolution();
                 instance.printTime();
             }

@@ -25,7 +25,7 @@ public:
     void printSolution();
     void printTime();
 private:
-    std::list<std::tuple<int, int> > getValues(std::vector<int>& path) const;
+    std::list<int> getValues(std::vector<int>& path) const;
     int getLowerBound(std::vector<int>& path, const int cost) const;
     void prepareTree();
     void branchAndBound(Node& node);

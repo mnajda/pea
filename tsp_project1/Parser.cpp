@@ -4,18 +4,28 @@
 #include <sstream>
 #include <stdexcept>
 
-Parser::Parser()
-{
-}
-
-std::list<std::tuple<int, int, int> > Parser::getCitiesList() const
-{
-    return citiesList;
-}
-
 std::vector<std::vector<int> > Parser::getCitiesMatrix() const
 {
     return citiesMatrix;
+}
+
+void Parser::convertToMatrix()
+{
+    std::vector<std::vector<int> > matrix(citiesList.size(), std::vector<int>(citiesList.size()));
+    int x, y;
+    auto it1 = citiesList.begin();
+    auto it2 = citiesList.begin();
+    for (int i = 0; i < citiesList.size(); ++i, ++it1)
+    {
+        it2 = citiesList.begin();
+        for (auto k = 0; k < citiesList.size(); ++k, ++it2)
+        {
+            x = std::get<1>(*it1) - std::get<1>(*it2);
+            y = std::get<2>(*it1) - std::get<2>(*it2);
+            matrix[i][k] = (lround(sqrt((x * x + y * y))));
+        }
+    }
+    citiesMatrix = std::move(matrix);
 }
 
 bool Parser::loadCitiesList(const std::string& filename)
@@ -40,10 +50,12 @@ bool Parser::loadCitiesList(const std::string& filename)
         file >> cityNumber >> firstCoordinate >> secondCoordinate;
         if (!file.good())
         {
-            return true;
+            break;
         }
         citiesList.push_back(std::make_tuple(cityNumber, firstCoordinate, secondCoordinate));
     }
+    convertToMatrix();
+    return true;
 }
 
 bool Parser::loadCitiesMatrix(const std::string& filename)
