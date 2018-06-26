@@ -1,5 +1,5 @@
-#include "Parser.h"
-#include "Instance.h"
+#include "Parser.hpp"
+#include "Instance.hpp"
 
 #include <iostream>
 

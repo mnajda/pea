@@ -1,5 +1,6 @@
-#include "Parser.h"
+#include "Parser.hpp"
 
+#include <cmath>
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
@@ -22,7 +23,7 @@ void Parser::convertToMatrix()
         {
             x = std::get<1>(*it1) - std::get<1>(*it2);
             y = std::get<2>(*it1) - std::get<2>(*it2);
-            matrix[i][k] = (lround(sqrt((x * x + y * y))));
+            matrix[i][k] = (std::lround(std::sqrt((x * x + y * y))));
         }
     }
     citiesMatrix = std::move(matrix);

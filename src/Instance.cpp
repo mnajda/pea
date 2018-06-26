@@ -1,6 +1,7 @@
-#include "Instance.h"
+#include "Instance.hpp"
 
 #include <iostream>
+#include <cmath>
 #include <algorithm>
 #include <functional>
 
@@ -46,7 +47,7 @@ Instance::Instance(std::list<std::tuple<int, int, int> > cities)
             auto second = std::next(cities.begin(), k);
             x = std::get<1>(*first) - std::get<1>(*second);
             y = std::get<2>(*first) - std::get<2>(*second);
-            costMatrix[i][k] = (lround(sqrt((x * x + y * y))));
+            costMatrix[i][k] = (std::lround(std::sqrt((x * x + y * y))));
         }
     }
     for (int i = 0; i < cities.size(); ++i)
