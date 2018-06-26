@@ -14,8 +14,12 @@ public:
     void printSolution();
 private:
     std::vector<bool> getVisited(const std::vector<int>& path) const;
+    void addMinValues(std::vector<int>& values, const std::vector<bool>& visited, int i) const;
     std::vector<int> getValues(const std::vector<int>& path) const;
     int getLowerBound(const std::vector<int>& path, int cost) const;
+    void updateBestSolution(const Node& node);
+    void createNode(const Node& node, std::vector<Node>& nodes, int i, int cost) const;
+    void createPromisingNodes(const Node& node, std::vector<Node>& nodes, int i) const;
     void branchAndBound(Node& node);
 
     Instance instance;

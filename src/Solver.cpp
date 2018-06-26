@@ -56,6 +56,22 @@ std::vector<bool> Solver::getVisited(const std::vector<int>& path) const
     return visited;
 }
 
+void Solver::addMinValues(std::vector<int>& values, const std::vector<bool>& visited, int i) const
+{
+    auto min = std::numeric_limits<int>::max();
+    if (!visited[i])
+    {
+        for (int j = 0; j < instance.size; ++j)
+        {
+            if (!visited[j])
+            {
+                min = std::min(min, instance[i][j]);
+            }
+        }
+        values.push_back(min);
+    }
+}
+
 std::vector<int> Solver::getValues(const std::vector<int>& path) const
 {
     std::vector<int> values;
@@ -63,18 +79,7 @@ std::vector<int> Solver::getValues(const std::vector<int>& path) const
 
     for (auto i = 0; i < instance.size; ++i)
     {
-        auto min = std::numeric_limits<int>::max();
-        if (!visited[i])
-        {
-            for (int j = 0; j < instance.size; ++j)
-            {
-                if (!visited[j])
-                {
-                    min = std::min(min, instance[i][j]);
-                }
-            }
-            values.push_back(min);
-        }
+        addMinValues(values, visited, i);
     }
 
     std::sort(values.begin(), values.end());
@@ -83,7 +88,7 @@ std::vector<int> Solver::getValues(const std::vector<int>& path) const
 
 int Solver::getLowerBound(const std::vector<int>& path, int cost) const
 {
-    int lowerBound = cost;
+    auto lowerBound = cost;
     auto minCosts = getValues(path);
     for (const auto minCost : minCosts)
     {
@@ -96,16 +101,40 @@ int Solver::getLowerBound(const std::vector<int>& path, int cost) const
     return lowerBound;
 }
 
+void Solver::updateBestSolution(const Node& node)
+{
+    if (node.cost < instance.minCost)
+    {
+        instance.minCost = node.cost;
+        instance.bestPath = node.currentPath;
+    }
+}
+
+void Solver::createNode(const Node& node, std::vector<Node>& nodes, int i, int cost) const
+{
+    nodes.emplace_back(node.currentPath, i);
+    nodes.back().currentPath.push_back(i);
+    nodes.back().cost = cost;
+}
+
+void Solver::createPromisingNodes(const Node& node, std::vector<Node>& nodes, int i) const
+{
+    if (find(node.currentPath.begin(), node.currentPath.end(), i) == node.currentPath.end())
+    {
+        auto cost = node.cost + instance[node.currentPath.back()][i];
+        if (cost < instance.minCost)
+        {
+            createNode(node, nodes, i, cost);
+        }
+    }
+}
+
 void Solver::branchAndBound(Node& node)
 {
     if (node.currentPath.size() == instance.size)
     {
         node.cost += instance[node.currentPath.back()][node.currentPath.front()];
-        if (node.cost < instance.minCost)
-        {
-            instance.minCost = node.cost;
-            instance.bestPath = node.currentPath;
-        }
+        updateBestSolution(node);
         return;
     }
     if (getLowerBound(node.currentPath, node.cost) < instance.minCost)
@@ -115,17 +144,9 @@ void Solver::branchAndBound(Node& node)
 
         for (auto i = 1; i < instance.size; ++i)
         {
-            if (std::find(node.currentPath.begin(), node.currentPath.end(), i) == node.currentPath.end())
-            {
-                int cost = node.cost + instance[node.currentPath.back()][i];
-                if (cost < instance.minCost)
-                {
-                    nodes.emplace_back(node.currentPath, i);
-                    nodes.back().currentPath.push_back(i);
-                    nodes.back().cost = cost;
-                }
-            }
+            createPromisingNodes(node, nodes, i);
         }
+
         for (auto& next : nodes)
         {
             branchAndBound(next);
