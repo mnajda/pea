@@ -15,15 +15,14 @@ void Parser::convertToMatrix()
     std::vector<std::vector<int> > matrix(citiesList.size(), std::vector<int>(citiesList.size()));
     int x, y;
     auto it1 = citiesList.begin();
-    auto it2 = citiesList.begin();
-    for (int i = 0; i < citiesList.size(); ++i, ++it1)
+    for (auto i = 0; i < citiesList.size(); ++i, ++it1)
     {
-        it2 = citiesList.begin();
+        auto it2 = citiesList.begin();
         for (auto k = 0; k < citiesList.size(); ++k, ++it2)
         {
             x = std::get<1>(*it1) - std::get<1>(*it2);
             y = std::get<2>(*it1) - std::get<2>(*it2);
-            matrix[i][k] = (std::lround(std::sqrt((x * x + y * y))));
+            matrix[i][k] = static_cast<int>(std::lround(std::sqrt((x * x + y * y))));
         }
     }
     citiesMatrix = std::move(matrix);
@@ -53,7 +52,7 @@ bool Parser::loadCitiesList(const std::string& filename)
         {
             break;
         }
-        citiesList.push_back(std::make_tuple(cityNumber, firstCoordinate, secondCoordinate));
+        citiesList.emplace_back(cityNumber, firstCoordinate, secondCoordinate);
     }
     convertToMatrix();
     return true;
@@ -61,7 +60,7 @@ bool Parser::loadCitiesList(const std::string& filename)
 
 bool Parser::loadCitiesMatrix(const std::string& filename)
 {
-    int dimension = 0;
+    decltype(citiesMatrix.size()) dimension = 0;
     std::ifstream file(filename);
     if (!file.is_open())
     {
@@ -81,9 +80,9 @@ bool Parser::loadCitiesMatrix(const std::string& filename)
     return true;
 }
 
-bool Parser::loadLowerDiagonalRow(const std::string & filename)
+bool Parser::loadLowerDiagonalRow(const std::string& filename)
 {
-    int dimension = 0;
+    decltype(citiesMatrix.size()) dimension = 0;
     std::ifstream file(filename);
     if (!file.is_open())
     {
@@ -94,7 +93,7 @@ bool Parser::loadLowerDiagonalRow(const std::string & filename)
     citiesMatrix.resize(dimension);
     for (int i = 0; i < dimension; ++i)
     {
-        for (int j = 0; j < (i + 1); ++j)
+        for (int j = 0; j < i + 1; ++j)
         {
             file >> line;
             citiesMatrix[i].push_back(std::stoi(line));
