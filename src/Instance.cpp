@@ -1,7 +1,9 @@
-#include "Instance.h"
+#include "Instance.hpp"
 
 #include <iostream>
+#include <cmath>
 #include <algorithm>
+#include <functional>
 
 Instance::Instance(std::vector<std::vector<int> > costMatrix, int enableBF)
 {
@@ -12,8 +14,10 @@ Instance::Instance(std::vector<std::vector<int> > costMatrix, int enableBF)
         costMatrix[i][i] = intMax;
     }
 
+    matrix = std::move(costMatrix);
+
     auto begin = clock::now();
-    prepareTree(costMatrix);
+    prepareTree();
     auto end = clock::now();
     time = end - begin;
 
@@ -21,7 +25,7 @@ Instance::Instance(std::vector<std::vector<int> > costMatrix, int enableBF)
     printTime();
 
     begin = clock::now();
-    bruteForce(costMatrix);
+    bruteForce();
     end = clock::now();
     time = end - begin;
 
@@ -43,7 +47,7 @@ Instance::Instance(std::list<std::tuple<int, int, int> > cities)
             auto second = std::next(cities.begin(), k);
             x = std::get<1>(*first) - std::get<1>(*second);
             y = std::get<2>(*first) - std::get<2>(*second);
-            costMatrix[i][k] = (lround(sqrt((x * x + y * y))));
+            costMatrix[i][k] = (std::lround(std::sqrt((x * x + y * y))));
         }
     }
     for (int i = 0; i < cities.size(); ++i)
@@ -51,8 +55,10 @@ Instance::Instance(std::list<std::tuple<int, int, int> > cities)
         costMatrix[i][i] = intMax;
     }
 
+    matrix = std::move(costMatrix);
+
     auto begin = clock::now();
-    prepareTree(costMatrix);
+    prepareTree();
     auto end = clock::now();
     time = end - begin;
 }
@@ -65,8 +71,11 @@ Instance::Instance(std::vector<std::vector<int> > costMatrix)
     {
         costMatrix[i][i] = intMax;
     }
+
+    matrix = std::move(costMatrix);
+
     auto begin = clock::now();
-    prepareTree(costMatrix);
+    prepareTree();
     auto end = clock::now();
     time = end - begin;
 }
@@ -95,16 +104,64 @@ void Instance::printTime()
     std::cout << std::chrono::duration_cast<std::chrono::seconds>(time).count() << "s" << std::endl;
 }
 
-void Instance::prepareTree(std::vector<std::vector<int> >& matrix)
+std::list<int> Instance::getValues(std::vector<int>& path) const
+{
+    std::list<int> values;
+    std::vector<bool> visited(matrix.size(), false);
+    for (int i = 0; i < matrix.size(); ++i)
+    {
+        if (std::find(path.begin(), path.end(), i) != path.end())
+        {
+            visited[i] = true;
+        }
+    }
+    for (int i = 0; i < matrix.size(); ++i)
+    {
+        int min = intMax;
+        if (!visited[i])
+        {
+            for (int j = 0; j < matrix.size(); ++j)
+            {
+                if (!visited[j])
+                {
+                    min = std::min(min, matrix[i][j]);
+                }
+            }
+            values.push_back(min);
+        }
+    }
+    values.sort();
+    return values;
+}
+
+int Instance::getLowerBound(std::vector<int>& path, const int cost) const
+{
+    int lowerBound = cost;
+    std::list<int> minCosts;
+    minCosts = getValues(path);
+    int city = 0;
+    while (!minCosts.empty())
+    {
+        lowerBound += minCosts.front();
+        if (lowerBound > minCost)
+        {
+            return lowerBound;
+        }
+        minCosts.pop_front();
+    }
+    return lowerBound;
+}
+
+void Instance::prepareTree()
 {
     std::vector<int> path;
     path.reserve(matrix.size());
     path.push_back(0);
     Node root{ path, 0 };
-    branchAndBound(matrix, root);
+    branchAndBound(root);
 }
 
-void Instance::branchAndBound(std::vector<std::vector<int> >& matrix, Node& node)
+void Instance::branchAndBound(Node& node)
 {
     if (node.currentPath.size() == matrix.size())
     {
@@ -116,28 +173,31 @@ void Instance::branchAndBound(std::vector<std::vector<int> >& matrix, Node& node
         }
         return;
     }
-    std::vector<Node> nodes;
-    nodes.reserve(matrix.size() - 1);
-    for (int i = 1; i < matrix.size(); ++i)
+    if (getLowerBound(node.currentPath, node.cost) < minCost)
     {
-        if (std::find(node.currentPath.begin(), node.currentPath.end(), i) == node.currentPath.end())
+        std::vector<Node> nodes;
+        nodes.reserve(matrix.size() - 1);
+        for (int i = 1; i < matrix.size(); ++i)
         {
-            int cost = node.cost + matrix[node.currentPath.back()][i];
-            if (cost < minCost)
+            if (std::find(node.currentPath.begin(), node.currentPath.end(), i) == node.currentPath.end())
             {
-                nodes.emplace_back(node.currentPath, i);
-                nodes.back().currentPath.push_back(i);
-                nodes.back().cost = cost;
+                int cost = node.cost + matrix[node.currentPath.back()][i];
+                if (cost < minCost)
+                {
+                    nodes.emplace_back(node.currentPath, i);
+                    nodes.back().currentPath.push_back(i);
+                    nodes.back().cost = cost;
+                }
             }
         }
-    }
-    for (auto& next : nodes)
-    {
-        branchAndBound(matrix, next);
+        for (auto& next : nodes)
+        {
+            branchAndBound(next);
+        }
     }
 }
 
-int Instance::calculateBruteForce(std::vector<std::vector<int> >& matrix, std::vector<int>& path) const
+int Instance::calculateBruteForce(std::vector<int>& path) const
 {
     int cost = 0;
     cost += matrix[0][path.front()];
@@ -149,7 +209,7 @@ int Instance::calculateBruteForce(std::vector<std::vector<int> >& matrix, std::v
     return cost;
 }
 
-void Instance::bruteForce(std::vector<std::vector<int> >& matrix)
+void Instance::bruteForce()
 {
     bestPath.clear();
     minCost = intMax;
@@ -161,7 +221,7 @@ void Instance::bruteForce(std::vector<std::vector<int> >& matrix)
     }
     do
     {
-        int cost = calculateBruteForce(matrix, path);
+        int cost = calculateBruteForce(path);
         if (cost < minCost)
         {
             minCost = cost;

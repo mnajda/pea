@@ -8,9 +8,9 @@
 class Parser
 {
 public:
-    Parser();
-    std::list<std::tuple<int, int, int> > getCitiesList() const;
+    Parser() = default;
     std::vector<std::vector<int> > getCitiesMatrix() const;
+    void convertToMatrix();
     bool loadCitiesList(const std::string& filename);
     bool loadCitiesMatrix(const std::string& filename);
     bool loadLowerDiagonalRow(const std::string& filename);

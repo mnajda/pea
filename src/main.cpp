@@ -1,5 +1,5 @@
-#include "Parser.h"
-#include "Instance.h"
+#include "Parser.hpp"
+#include "Instance.hpp"
 
 #include <iostream>
 
@@ -47,7 +47,7 @@ int main(int argc, char** argv)
 
                 Parser parser;
                 parser.loadCitiesList(filename);
-                Instance instance(parser.getCitiesList());
+                Instance instance(parser.getCitiesMatrix());
                 instance.printSolution();
                 instance.printTime();
             }
