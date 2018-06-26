@@ -15,7 +15,7 @@ void Solver::run()
     auto begin = std::chrono::system_clock::now();
 
     path.push_back(0);
-    Node root{ path, 0 };
+    Node root{path};
     branchAndBound(root);
 
     auto end = std::chrono::system_clock::now();
@@ -38,7 +38,6 @@ void Solver::printSolution()
     std::cout << std::endl;
     std::cout << std::endl;
 
-    std::cout << std::chrono::duration_cast<std::chrono::nanoseconds>(elapsedTime).count() << "ns ";
     std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(elapsedTime).count() << "ms ";
     std::cout << std::chrono::duration_cast<std::chrono::seconds>(elapsedTime).count() << "s" << std::endl;
 }
@@ -61,7 +60,7 @@ void Solver::addMinValues(std::vector<int>& values, const std::vector<bool>& vis
     auto min = std::numeric_limits<int>::max();
     if (!visited[i])
     {
-        for (int j = 0; j < instance.size; ++j)
+        for (auto j = 0; j < instance.size; ++j)
         {
             if (!visited[j])
             {
@@ -112,7 +111,7 @@ void Solver::updateBestSolution(const Node& node)
 
 void Solver::createNode(const Node& node, std::vector<Node>& nodes, int i, int cost) const
 {
-    nodes.emplace_back(node.currentPath, i);
+    nodes.emplace_back(node.currentPath);
     nodes.back().currentPath.push_back(i);
     nodes.back().cost = cost;
 }

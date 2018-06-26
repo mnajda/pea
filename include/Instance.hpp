@@ -6,6 +6,7 @@
 struct Instance
 {
 public:
+    Instance() = delete;
     explicit Instance(std::vector<std::vector<int>> costMatrix);
     const std::vector<int>& operator[](int pos) const { return matrix[pos]; }
 
