@@ -31,8 +31,8 @@ int main(int argc, char** argv)
                 std::cout << "Filename: \n";
                 std::cin >> filename;
 
-                Parser parser;
-                parser.loadCitiesMatrix(filename);
+                Parser parser(filename);
+                parser.loadCitiesMatrix();
 
                 runAndPrintResults(parser);
             }
@@ -49,8 +49,8 @@ int main(int argc, char** argv)
                 std::cout << "Filename: \n";
                 std::cin >> filename;
 
-                Parser parser;
-                parser.loadCitiesList(filename);
+                Parser parser(filename);
+                parser.loadCitiesList();
 
                 runAndPrintResults(parser);
             }
@@ -67,8 +67,8 @@ int main(int argc, char** argv)
                 std::cout << "Filename: \n";
                 std::cin >> filename;
 
-                Parser parser;
-                parser.loadLowerDiagonalRow(filename);
+                Parser parser(filename);
+                parser.loadLowerDiagonalRow();
 
                 runAndPrintResults(parser);
             }

@@ -1,24 +1,26 @@
 #include "Parser.hpp"
 
 #include <cmath>
-#include <fstream>
 #include <sstream>
 #include <stdexcept>
+
+Parser::Parser(const std::string& filename) : file(std::ifstream(filename))
+{
+    if (!file.is_open())
+    {
+        throw std::runtime_error("Can't open file");
+    }
+}
 
 std::vector<std::vector<int> > Parser::getCitiesMatrix() const
 {
     return citiesMatrix;
 }
 
-void Parser::loadCitiesList(const std::string& filename)
+void Parser::loadCitiesList()
 {
     std::list<std::tuple<int, int, int>> citiesList;
-    std::ifstream file(filename);
-    if (!file.is_open())
-    {
-        throw std::runtime_error("Can't open file");
-    }
-    skipToCoordinates(file);
+    skipToCoordinates();
 
     int cityNumber, firstCoordinate, secondCoordinate;
     for (;;)
@@ -33,14 +35,9 @@ void Parser::loadCitiesList(const std::string& filename)
     citiesMatrix = convertToMatrix(citiesList);
 }
 
-void Parser::loadCitiesMatrix(const std::string& filename)
+void Parser::loadCitiesMatrix()
 {
     decltype(citiesMatrix.size()) dimension = 0;
-    std::ifstream file(filename);
-    if (!file.is_open())
-    {
-        throw std::runtime_error("Can't open file");
-    }
     std::string line;
     file >> dimension;
     citiesMatrix.resize(dimension);
@@ -54,14 +51,9 @@ void Parser::loadCitiesMatrix(const std::string& filename)
     }
 }
 
-void Parser::loadLowerDiagonalRow(const std::string& filename)
+void Parser::loadLowerDiagonalRow()
 {
     decltype(citiesMatrix.size()) dimension = 0;
-    std::ifstream file(filename);
-    if (!file.is_open())
-    {
-        throw std::runtime_error("Can't open file");
-    }
     std::string line;
     file >> dimension;
     citiesMatrix.resize(dimension);
@@ -82,7 +74,7 @@ void Parser::loadLowerDiagonalRow(const std::string& filename)
     }
 }
 
-void Parser::skipToCoordinates(std::ifstream& file) const
+void Parser::skipToCoordinates()
 {
     std::string line;
     while (file.good())
