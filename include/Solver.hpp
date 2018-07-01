@@ -14,8 +14,9 @@ public:
     void printSolution();
 private:
     std::vector<bool> getVisited(const std::vector<int>& path) const;
-    std::vector<int> getMinCosts(const std::vector<bool> &visited) const;
-    std::vector<int> getSortedCosts(const std::vector<int> &path) const;
+    std::vector<int> getMinCosts(const std::vector<bool>& visited) const;
+    std::vector<int> getSortedCosts(const std::vector<int>& path) const;
+    int getLowestReturnCost(const std::vector<int>& path) const;
     int getLowerBound(const std::vector<int>& path, int cost) const;
     void updateBestSolution(const Node& node);
     void createNode(const Node& node, std::vector<Node>& nodes, int i, int cost) const;

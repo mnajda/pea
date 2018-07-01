@@ -4,6 +4,11 @@
 #include <iostream>
 #include <chrono>
 
+namespace
+{
+constexpr auto intMax = std::numeric_limits<int>::max();
+} // namespace
+
 Solver::Solver(std::vector<std::vector<int>> costMatrix) : instance(std::move(costMatrix))
 {
 }
@@ -60,7 +65,7 @@ std::vector<int> Solver::getMinCosts(const std::vector<bool>& visited) const
     std::vector<int> values;
     for (auto i = 0; i < instance.size; ++i)
     {
-        auto min = std::numeric_limits<int>::max();
+        auto min = intMax;
         if (!visited[i])
         {
             for (auto j = 0; j < instance.size; ++j)
@@ -85,6 +90,16 @@ std::vector<int> Solver::getSortedCosts(const std::vector<int>& path) const
     return values;
 }
 
+int Solver::getLowestReturnCost(const std::vector<int>& path) const
+{
+    auto min = intMax;
+    for (auto i = 0; i < instance.size; ++i)
+    {
+        min = std::min(min, instance[path.front()][i]);
+    }
+    return min;
+}
+
 int Solver::getLowerBound(const std::vector<int>& path, int cost) const
 {
     auto lowerBound = cost;
@@ -97,7 +112,7 @@ int Solver::getLowerBound(const std::vector<int>& path, int cost) const
             return lowerBound;
         }
     }
-    return lowerBound;
+    return lowerBound + getLowestReturnCost(path);
 }
 
 void Solver::updateBestSolution(const Node& node)
@@ -144,7 +159,7 @@ void Solver::branchAndBound(Node& node)
         updateBestSolution(node);
         return;
     }
-    if (getLowerBound(node.currentPath, node.cost) < instance.minCost)
+    if (getLowerBound(node.currentPath, node.cost) <= instance.minCost)
     {
         std::vector<Node> nodes = createPromisingNodes(node);
         for (auto& next : nodes)
