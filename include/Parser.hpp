@@ -2,19 +2,23 @@
 
 #include <string>
 #include <list>
+#include <fstream>
 #include <vector>
 #include <tuple>
 
 class Parser
 {
 public:
-    Parser() = default;
-    std::vector<std::vector<int> > getCitiesMatrix() const;
-    void convertToMatrix();
-    bool loadCitiesList(const std::string& filename);
-    bool loadCitiesMatrix(const std::string& filename);
-    bool loadLowerDiagonalRow(const std::string& filename);
+    explicit Parser(const std::string& filename);
+    std::vector<std::vector<int>> getCitiesMatrix() const;
+
+    void loadCitiesList();
+    void loadCitiesMatrix();
+    void loadLowerDiagonalRow();
 private:
-    std::list<std::tuple<int, int, int> > citiesList;
-    std::vector<std::vector<int> > citiesMatrix;
+    void skipToCoordinates();
+    std::vector<std::vector<int>> convertToMatrix(const std::list<std::tuple<int, int, int>>& citiesList);
+
+    std::ifstream file;
+    std::vector<std::vector<int>> citiesMatrix;
 };

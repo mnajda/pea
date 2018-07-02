@@ -1,43 +1,82 @@
 #include "Parser.hpp"
 
 #include <cmath>
-#include <fstream>
 #include <sstream>
 #include <stdexcept>
+
+Parser::Parser(const std::string& filename) : file(std::ifstream(filename))
+{
+    if (!file.is_open())
+    {
+        throw std::runtime_error("Can't open file");
+    }
+}
 
 std::vector<std::vector<int> > Parser::getCitiesMatrix() const
 {
     return citiesMatrix;
 }
 
-void Parser::convertToMatrix()
+void Parser::loadCitiesList()
 {
-    std::vector<std::vector<int> > matrix(citiesList.size(), std::vector<int>(citiesList.size()));
-    int x, y;
-    auto it1 = citiesList.begin();
-    auto it2 = citiesList.begin();
-    for (int i = 0; i < citiesList.size(); ++i, ++it1)
+    std::list<std::tuple<int, int, int>> citiesList;
+    skipToCoordinates();
+
+    int cityNumber, firstCoordinate, secondCoordinate;
+    for (;;)
     {
-        it2 = citiesList.begin();
-        for (auto k = 0; k < citiesList.size(); ++k, ++it2)
+        file >> cityNumber >> firstCoordinate >> secondCoordinate;
+        if (!file.good())
         {
-            x = std::get<1>(*it1) - std::get<1>(*it2);
-            y = std::get<2>(*it1) - std::get<2>(*it2);
-            matrix[i][k] = (std::lround(std::sqrt((x * x + y * y))));
+            break;
         }
+        citiesList.emplace_back(cityNumber, firstCoordinate, secondCoordinate);
     }
-    citiesMatrix = std::move(matrix);
+    citiesMatrix = convertToMatrix(citiesList);
 }
 
-bool Parser::loadCitiesList(const std::string& filename)
+void Parser::loadCitiesMatrix()
 {
-    std::ifstream file(filename);
-    if (!file.is_open())
-    {
-        throw std::runtime_error("Can't open file");
-    }
+    decltype(citiesMatrix.size()) dimension = 0;
     std::string line;
-    int cityNumber, firstCoordinate, secondCoordinate;
+    file >> dimension;
+    citiesMatrix.resize(dimension);
+    for (auto i = 0; i < dimension; ++i)
+    {
+        for (auto j = 0; j < dimension; ++j)
+        {
+            file >> line;
+            citiesMatrix[i].push_back(std::stoi(line));
+        }
+    }
+}
+
+void Parser::loadLowerDiagonalRow()
+{
+    decltype(citiesMatrix.size()) dimension = 0;
+    std::string line;
+    file >> dimension;
+    citiesMatrix.resize(dimension);
+    for (auto i = 0; i < dimension; ++i)
+    {
+        for (auto j = 0; j < i + 1; ++j)
+        {
+            file >> line;
+            citiesMatrix[i].push_back(std::stoi(line));
+        }
+    }
+    for (auto i = 0; i < dimension; ++i)
+    {
+        for (auto j = i + 1; j < dimension; ++j)
+        {
+            citiesMatrix[i].push_back(citiesMatrix[j][i]);
+        }
+    }
+}
+
+void Parser::skipToCoordinates()
+{
+    std::string line;
     while (file.good())
     {
         file >> line;
@@ -46,66 +85,22 @@ bool Parser::loadCitiesList(const std::string& filename)
             break;
         }
     }
-    for (;;)
-    {
-        file >> cityNumber >> firstCoordinate >> secondCoordinate;
-        if (!file.good())
-        {
-            break;
-        }
-        citiesList.push_back(std::make_tuple(cityNumber, firstCoordinate, secondCoordinate));
-    }
-    convertToMatrix();
-    return true;
 }
 
-bool Parser::loadCitiesMatrix(const std::string& filename)
+std::vector<std::vector<int>> Parser::convertToMatrix(const std::list<std::tuple<int, int, int>>& citiesList)
 {
-    int dimension = 0;
-    std::ifstream file(filename);
-    if (!file.is_open())
+    std::vector<std::vector<int>> matrix(citiesList.size(), std::vector<int>(citiesList.size()));
+    int x, y;
+    auto it1 = citiesList.begin();
+    for (auto i = 0; i < citiesList.size(); ++i, ++it1)
     {
-        throw std::runtime_error("Can't open file");
-    }
-    std::string line;
-    file >> dimension;
-    citiesMatrix.resize(dimension);
-    for (int i = 0; i < dimension; ++i)
-    {
-        for (int j = 0; j < dimension; ++j)
+        auto it2 = citiesList.begin();
+        for (auto k = 0; k < citiesList.size(); ++k, ++it2)
         {
-            file >> line;
-            citiesMatrix[i].push_back(std::stoi(line));
+            x = std::get<1>(*it1) - std::get<1>(*it2);
+            y = std::get<2>(*it1) - std::get<2>(*it2);
+            matrix[i][k] = static_cast<int>(std::lround(std::sqrt((x * x + y * y))));
         }
     }
-    return true;
-}
-
-bool Parser::loadLowerDiagonalRow(const std::string & filename)
-{
-    int dimension = 0;
-    std::ifstream file(filename);
-    if (!file.is_open())
-    {
-        throw std::runtime_error("Can't open file");
-    }
-    std::string line;
-    file >> dimension;
-    citiesMatrix.resize(dimension);
-    for (int i = 0; i < dimension; ++i)
-    {
-        for (int j = 0; j < (i + 1); ++j)
-        {
-            file >> line;
-            citiesMatrix[i].push_back(std::stoi(line));
-        }
-    }
-    for (int i = 0; i < dimension; ++i)
-    {
-        for (int j = i + 1; j < dimension; ++j)
-        {
-            citiesMatrix[i].push_back(citiesMatrix[j][i]);
-        }
-    }
-    return true;
+    return matrix;
 }
